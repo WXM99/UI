@@ -1,5 +1,6 @@
 <template>
     <div>
+        信息
         {{msg}}
     </div>
 </template>
@@ -10,7 +11,8 @@
         data() {
             return {
                 websock: null,
-                msg: ''
+                username: "wxm",
+                msg: []
             }
         },
         created() {
@@ -21,30 +23,30 @@
         },
         methods: {
             initWebSocket() {
-                // todo: change to server ip
-                const wsuri = "ws://127.0.0.1:8080";
-                this.websock = new WebSocket(wsuri);
+                // todo: change to ws server addr
+                const wsUrl = 'ws://localhost:8089/connection/' + this.username;
+                this.websock = new WebSocket(wsUrl);
                 this.websock.onmessage = this.websocketonmessage;
                 this.websock.onopen = this.websocketonopen;
                 this.websock.onerror = this.websocketonerror;
                 this.websock.onclose = this.websocketclose;
             },
             websocketonopen() {
-                let actions = {"test": "12345"};
-                this.websocketsend(JSON.stringify(actions));
+                // let actions = {"msg": "hello, server!"};
+                // this.websocketsend(JSON.stringify(actions));
             },
             websocketonerror() {
-                this.initWebSocket();
+              //  this.initWebSocket();
             },
             websocketonmessage(e) {
-                const redata = JSON.parse(e.data);
-                this.msg = redata
+                console.log(e)
+                this.msg.push(JSON.parse(e.data))
             },
             websocketsend(Data) {
                 this.websock.send(Data);
             },
             websocketclose(e) {
-                console.log('断开连接', e);
+                console.log('closing connection...', e);
             },
         },
     }
