@@ -13,15 +13,25 @@ const router = new Router({
     // ordinary user pages
     routes: [
         {
-            path: '/',
+            path: '/trader',
             component: loadView('TabbarFrame'),
             children: [
                 {
                     path: 'marketdepth',
                     name: 'marketdepth',
                     component: loadView('marketDepth/OrderBook')
+                },
+                {
+                    path: '',
+                    name: 'index',
+                    component: loadView('marketDepth/index')
                 }
             ]
+        },
+        {
+            path: '/',
+            name: 'login',
+            component: loadView('login')
         }
     ]
 });

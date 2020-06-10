@@ -1,15 +1,15 @@
 <template>
     <a-layout id="components-layout-demo-fixed">
         <a-layout-header :style="{ position: 'fixed', zIndex: 1, width: '100%' }">
-            <div class="logo">
+            <div class="logo" @click="toPage('/trader')">
                 <span style="font-weight: bold; font-size: 40px">FUDE</span><br>
                 <span style="font-weight: normal">FU</span>tures tra<span style="font-weight: normal">DE</span> sys.
             </div>
 
                 <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
                     <!--:default-selected-keys="['2']"-->
-                    <a-menu-item key="1">Market Depth</a-menu-item>
-                    <a-menu-item key="2">Order History</a-menu-item>
+                    <a-menu-item key="1" @click="toPage('/trader/marketdepth')">Market Depth</a-menu-item>
+                    <a-menu-item key="2" @click="toPage('/trader/orders')">Order History</a-menu-item>
                 </a-menu>
 
         </a-layout-header>
@@ -68,6 +68,9 @@
             toGithub () {
                 let url="https://github.com/FUDE-EIS2020";
                 window.open(url,'_blank');
+            },
+            toPage(url) {
+                this.$router.push(url)
             }
         },
         mounted() {

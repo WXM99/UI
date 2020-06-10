@@ -39,8 +39,8 @@
               //  this.initWebSocket();
             },
             websocketonmessage(e) {
-                console.log(e)
-                this.msg.push(JSON.parse(e.data))
+                console.log(e);
+                this.msg.push(e.data)
             },
             websocketsend(Data) {
                 this.websock.send(Data);
