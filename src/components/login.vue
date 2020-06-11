@@ -201,7 +201,7 @@
                 this.traderForm.validateFields((err, values) => {
                     if (!err) {
                         console.log('Received values of form: ', values);
-                        this.$router.push('/trader')
+                        this.$router.push('/')
                     }
                 });
             },

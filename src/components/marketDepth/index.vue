@@ -6,47 +6,47 @@
             </div>
         </a-divider>
         <div style="text-align: center">
-        <div style="font-size: 16px; font-weight: 300; color: #888">Market Clock</div>
-        <dic style="font-size: 22px; font-weight: 200">{{time}}</dic>
+            <div style="font-size: 16px; font-weight: 300; color: #888">Market Clock</div>
+            <div style="font-size: 22px; font-weight: 200">{{time}}</div>
         </div>
         <a-row type="flex" justify="space-around">
             <a-col :span="12">
                 <div class="fd-card">
-                    <div class="br-title"> Broker: Morgan Stanley Huaxin Securities <span
+                    <div class="br-title"> Broker: Morgan Stanley Huaxin Securities Co., Ltd. <span
                             style="float: right">600621</span></div>
                     <div class="fd-card">
                         <p class="pr-title">WIT OCT-2020</p>
                         <p style="text-align: center">Update At: {{time}}</p>
                         <a-row style="text-align: center">
                             <a-col :span="12">
-                            <a-statistic
-                                    title="Market Price of Selling"
-                                    :value="11.28"
-                                    :precision="2"
-                                    suffix="CNY/share"
-                                    :value-style="{ color: '#345586' }"
-                                    style="margin-left: 20px">
-                                <template #prefix>
-                                    <a-icon type="logout"/>
-                                </template>
-                            </a-statistic>
+                                <a-statistic
+                                        title="Market Price of Selling"
+                                        :value="11.28"
+                                        :precision="2"
+                                        suffix="CNY/share"
+                                        :value-style="{ color: '#345586' }"
+                                        style="margin-left: 20px">
+                                    <template #prefix>
+                                        <a-icon type="logout"/>
+                                    </template>
+                                </a-statistic>
                             </a-col>
                             <a-col :span="12">
-                            <a-statistic
-                                    title="Market Price of Buying"
-                                    :value="10.23"
-                                    :precision="2"
-                                    suffix="CNY/share"
-                                    :value-style="{ color: '#cf7426' }"
-                                    style="margin-left: 20px">
-                                <template #prefix>
-                                    <a-icon type="login"/>
-                                </template>
-                            </a-statistic>
+                                <a-statistic
+                                        title="Market Price of Buying"
+                                        :value="10.23"
+                                        :precision="2"
+                                        suffix="CNY/share"
+                                        :value-style="{ color: '#cf7426' }"
+                                        style="margin-left: 20px">
+                                    <template #prefix>
+                                        <a-icon type="login"/>
+                                    </template>
+                                </a-statistic>
                             </a-col>
                         </a-row>
                         <div style="text-align: center; margin-top: 20px">
-                        <a-button>Detailed Market Depth</a-button>
+                            <a-button @click="toPage('/md/hx-wit-oct2020')">Detailed Market Depth</a-button>
                         </div>
                     </div>
                     <div class="fd-card">
@@ -123,7 +123,8 @@
             </a-col>
             <a-col :span="12">
                 <div class="fd-card">
-                    <div class="br-title"> Broker: Everbright Securities <span style="float: right">601788</span></div>
+                    <div class="br-title"> Broker: Everbright Securities Co., Ltd. <span
+                            style="float: right">601788</span></div>
                     <div class="fd-card">
                         <p class="pr-title">WIT OCT-2020</p>
                         <p style="text-align: center">Update At: {{time}}</p>
@@ -250,6 +251,9 @@
             }, 1000)
         },
         methods: {
+            toPage(url) {
+                this.$router.push(url)
+            }
         }
     }
 </script>

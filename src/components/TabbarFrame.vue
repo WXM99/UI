@@ -1,15 +1,15 @@
 <template>
     <a-layout id="components-layout-demo-fixed">
-        <a-layout-header :style="{ position: 'fixed', zIndex: 1, width: '100%' }">
-            <div class="logo" @click="toPage('/trader')">
-                <span style="font-weight: bold; font-size: 40px">FUDE</span><br>
-                <span style="font-weight: normal">FU</span>tures tra<span style="font-weight: normal">DE</span> sys.
+        <a-layout-header :style="{ position: 'fixed', zIndex: 3, width: '100%' }">
+            <div class="logo" @click="toPage('/')">
+                <span class="fude-title" style="font-weight: 200; font-size: 40px">F U D E</span><br>
+                <span style="font-weight: 300">FU</span>TURES TRA<span style="font-weight: 300">DE</span> SYSTE
             </div>
 
                 <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
                     <!--:default-selected-keys="['2']"-->
-                    <a-menu-item key="1" @click="toPage('/trader/marketdepth')">Market Depth</a-menu-item>
-                    <a-menu-item key="2" @click="toPage('/trader/orders')">Order History</a-menu-item>
+                    <a-menu-item key="1" @click="toPage('/')">Market Depth</a-menu-item>
+                    <a-menu-item key="2" @click="toPage('/tx')">Transcation Records</a-menu-item>
                 </a-menu>
 
         </a-layout-header>
@@ -34,9 +34,16 @@
         margin: 14px 0px 0px 0;
         float: left;
         line-height: 18px;
-        text-align: center;
         color: #fff;
-        font-weight: lighter;
+        text-align: center;
+        font-weight: 100;
+        font-size: 11px;
+    }
+
+    .fude-title {
+        background: linear-gradient(#97b8d5, #ffffff);;
+        -webkit-background-clip: text;
+        color: transparent;
     }
 
     .ant-layout-header {
@@ -47,7 +54,7 @@
         background: rgba(0, 0, 0, 0);
         text-align: right;
         font-size: 20px;
-        font-weight: lighter;
+        font-weight: 300;
     }
 
     .ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
