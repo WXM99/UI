@@ -1,9 +1,9 @@
 <template>
     <a-layout id="components-layout-demo-fixed">
-        <a-layout-header :style="{ position: 'fixed', zIndex: 3, width: '100%' }">
+        <a-layout-header :style="{ position: 'fixed', zIndex: 999, width: '100%' }">
             <div class="logo" @click="toPage('/')">
                 <span class="fude-title" style="font-weight: 200; font-size: 40px">F U D E</span><br>
-                <span style="font-weight: 300">FU</span>TURES TRA<span style="font-weight: 300">DE</span> SYSTE
+                <span style="font-weight: 300">FU</span>TURES TRA<span style="font-weight: 300">DE</span> SYSTEM
             </div>
 
                 <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">

@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import Vuex from 'vuex'
 import axios from '../node_modules/axios'
+import VueApexCharts from 'vue-apexcharts'
 
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
@@ -10,6 +11,8 @@ import 'ant-design-vue/dist/antd.css'
 Vue.config.productionTip = false;
 Vue.use(Antd);
 Vue.use(Vuex);
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
 
 /* axios default settings */
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

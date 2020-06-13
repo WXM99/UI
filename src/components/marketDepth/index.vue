@@ -21,7 +21,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="11.28"
+                                        :value="this.prices[1][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -34,7 +34,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="10.23"
+                                        :value="this.prices[1][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -56,7 +56,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="85.21"
+                                        :value="this.prices[3][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -69,7 +69,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="84.18"
+                                        :value="this.prices[3][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -91,7 +91,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="219.12"
+                                        :value="this.prices[5][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -104,7 +104,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="211.43"
+                                        :value="this.prices[5][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -132,7 +132,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="11.28"
+                                        :value="this.prices[0][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -145,7 +145,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="10.23"
+                                        :value="this.prices[0][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -167,7 +167,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="85.21"
+                                        :value="this.prices[2][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -180,7 +180,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="84.18"
+                                        :value="this.prices[2][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -202,7 +202,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="219.12"
+                                        :value="this.prices[4][0]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -215,7 +215,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="211.43"
+                                        :value="this.prices[4][1]"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -242,6 +242,9 @@
                 activeKey: ['1', '2'],
                 deadline: Date.now() + 1000 * 60 * 60 * 24 * 1,
                 time: '',
+                prices: [
+                    [12.12, 10.23],[15.31, 10,14],[22.12, 19.89],[23.54, 21.41],[351.13, 330.32],[364.86, 320.90]
+                ]
             }
         },
         mounted() {
@@ -249,10 +252,25 @@
             this.time = setInterval(() => {
                 _this.time = new Date(); // 修改数据date
             }, 1000)
+            this.time = setInterval(() => {
+                _this.updatePrices();
+            }, 1451)
         },
         methods: {
             toPage(url) {
                 this.$router.push(url)
+            },
+            updatePrices() {
+                var tmp = [];
+                for (var i in this.prices) {
+                    var prc = this.prices[i];
+                    var p1 = prc[0] + (Math.random()-0.5)*2;
+                    var p2 = prc[1] + (Math.random()-0.5)*2;
+                    prc[0] = Math.max(p1, p2);
+                    prc[1] = Math.min(p1, p2);
+                    tmp.push(prc)
+                }
+                this.prices = tmp;
             }
         }
     }

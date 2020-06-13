@@ -89,6 +89,9 @@
                 </div>
             </span>
                 </a-table>
+                <div style="margin: 20px">
+                    <apexchart type="area" height="350" :options="chartOptions" :series="series" :key="this.upCount"></apexchart>
+                </div>
             </a-col>
         </a-row>
         <a-row>
@@ -213,13 +216,12 @@
                 </div>
             </a-col>
         </a-row>
-
-
     </div>
 </template>
 
 <script>
     import ACol from "ant-design-vue/es/grid/Col";
+    import VueApexCharts from 'vue-apexcharts'
 
     const columns = [
         {
@@ -254,41 +256,15 @@
         },
     ];
     export default {
-        name: 'test',
-        components: {ACol},
+        name: 'OrderBook',
+        components: {
+            ACol,
+            apexchart: VueApexCharts
+        },
         mounted() {
-            let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
-            this.time = setInterval(() => {
-                _this.time = new Date(); // 修改数据date
-            }, 1000);
-            let sells = this.md[0];
-            let buyrs = this.md[1];
-            var i = 0;
-            for (var row in sells) {
-                let order = {
-                    'llevel': sells.length - i,
-                    'svol': sells[row].amount,
-                    'price': sells[row].price,
-                    'bvol': '',
-                    'rlevel': ''
-                };
-                this.sortedMd.push(order);
-                i += 1;
-            }
-            i = 1;
-            for (var brow in buyrs) {
-                let order = {
-                    'rlevel': i,
-                    'bvol': buyrs[brow].amount,
-                    'price': buyrs[brow].price,
-                    'svol': '',
-                    'llevel': ''
-                };
-                this.sortedMd.push(order);
-                i += 1;
-            }
-            this.mpb = buyrs[0].price;
-            this.mps = sells[sells.length - 1].price;
+            this.updateTime();
+            this.updateTable();
+            this.updateChart();
         },
         data() {
             return {
@@ -302,15 +278,48 @@
                         {'amount': 981, 'price': 20.19},
                         {'amount': 1050, 'price': 18.11},
                         {'amount': 510, 'price': 15.21},
+                        {'amount': 110, 'price': 13.61},
                     ],
                     [
                         {'amount': 131, 'price': 13.11},
                         {'amount': 831, 'price': 11.11},
-                        {'amount': 81, 'price': 4.19},
-                        {'amount': 14, 'price': 3.15},
+                        {'amount': 81, 'price': 10.19},
+                        {'amount': 14, 'price': 10.15},
+                        {'amount': 121, 'price': 10.01},
                     ]
                 ],
                 columns,
+                chartOptions:{
+                    chart: {
+                        height: 450,
+                        type: 'area',
+                        zoom: {
+                            enabled: false
+                        },
+                        animations: {
+                            enabled: false
+                        },
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                    },
+                    colors: ['#ffad69','#008FFB'],
+                    xaxis: {
+                        type: 'datetime',
+                        categories: [],
+                    },
+                    tooltip: {
+                        x: {
+                            format: 'dd/MM/yy HH:mm'
+                        },
+                    },
+                    legend: {
+                        position: 'top',
+                        offsetX: -10
+                    },
+                },
                 sortedMd: [],
                 mps: 0,
                 mpb: 0,
@@ -324,14 +333,23 @@
                     traderID: '',
                     confirmed: false
                 },
-                spinning: false
+                spinning: false,
+                series: [{
+                    name: 'Buying Market Price',
+                    data: []
+                }, {
+                    name: 'Selling Market Price',
+                    data: []
+                }],
+                upCount: 0,
             }
         },
         created() {
+            // todo:
             //this.initWebSocket();
         },
         destroyed() {
-            this.websock.close()
+            // this.websock.close()
         },
         methods: {
             submitOrder() {
@@ -374,6 +392,98 @@
             websocketclose(e) {
                 console.log('closing connection...', e);
             },
+            updateTime() {
+                let _this = this;
+                this.time = setInterval(() => {
+                    _this.time = new Date();
+                }, 1000);
+            },
+            updateTable(){
+                let sells = this.md[0];
+                let buyrs = this.md[1];
+                var i = 0;
+                var tmpTable = [];
+                for (var row in sells) {
+                    let order = {
+                        'llevel': sells.length - i,
+                        'svol': sells[row].amount,
+                        'price': sells[row].price,
+                        'bvol': '',
+                        'rlevel': ''
+                    };
+                    tmpTable.push(order);
+                    i += 1;
+                }
+                i = 1;
+                for (var brow in buyrs) {
+                    let order = {
+                        'rlevel': i,
+                        'bvol': buyrs[brow].amount,
+                        'price': buyrs[brow].price,
+                        'svol': '',
+                        'llevel': ''
+                    };
+                    tmpTable.push(order);
+                    i += 1;
+                }
+                this.mpb = buyrs[0].price;
+                this.mps = sells[sells.length - 1].price;
+                this.sortedMd = tmpTable;
+            },
+            updateChart() {
+                let _this = this;
+                var xtime = new Date();
+                    this.time = setInterval(() => {
+                        xtime = new Date(xtime.getTime() + 60*60*1000);
+                        _this.chartOptions.xaxis.categories.push(
+                            xtime.getFullYear()+"-"+
+                            (xtime.getMonth()+1)+"-"+
+                            xtime.getDate()+"T"+
+                            xtime.getHours()+":"+
+                            xtime.getMinutes()+":"+
+                            xtime.getSeconds()+"Z"
+                        );
+                        // update table and md
+                        _this.simuTx();
+                        // update chart
+                        _this.series[0].data.push(Math.floor(this.mpb *100)/100);
+                        _this.series[1].data.push(Math.floor(this.mps *100)/100);
+
+                        _this.upCount += 1;
+
+                        if (_this.upCount > 16) {
+                            _this.chartOptions.xaxis.categories.shift();
+                            _this.series[0].data.shift();
+                            _this.series[1].data.shift();
+                        }
+                    }, 1451);
+            },
+            compare(property) {
+                return function(a,b){
+                    var value1 = a[property];
+                    var value2 = b[property];
+                    return value2 - value1;
+                }
+            },
+            simuTx(){
+              var allTx = this.md[0].concat(this.md[1]);
+              for (var i in allTx) {
+                  allTx[i]['price'] += ((Math.random()-0.5)*3);
+              }
+              allTx.sort(this.compare('price'));
+              var tmp0 = [];
+              var tmp1 = [];
+              for (var j in allTx) {
+                  if (j < 5) {
+                      tmp0.push(allTx[j])
+                  }  else {
+                      tmp1.push(allTx[j])
+                  }
+              }
+              this.md[0] = tmp0;
+              this.md[1] = tmp1;
+              this.updateTable();
+            }
         },
     }
 </script>

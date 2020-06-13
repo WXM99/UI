@@ -137,10 +137,10 @@
                                                 placeholder="Select Your Broker Company"
                                                 style="width: 100%" v-decorator="['company']">
                                             <a-select-option value="MS">
-                                                Morgan Stanley
+                                                Morgan Stanley Huaxin Securities
                                             </a-select-option>
                                             <a-select-option value="EB">
-                                                Everbright
+                                                Everbright Securities
                                             </a-select-option>
                                         </a-select>
                                     </a-form-item>
