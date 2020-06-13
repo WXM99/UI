@@ -1,10 +1,10 @@
 <template>
     <div style="text-align: center;">
-        <a-row style="min-height: 510px">
+        <a-row style="min-height: 510px" align="middle">
             <a-col :span="6">
-                <a-affix :offset-top="100">
-                    <div class="fd-card"
-                         style="background: #fff; margin: 0 20px; margin-bottom: 20px; z-index: 2; padding: 20px">
+                <div class="fd-card"
+                         style="background: #fff; margin: 0 10px; margin-bottom: 20px;
+                          z-index: 2; padding: 20px; padding-top: 65px; padding-bottom: 65px">
                         <a-button style="font-size: 18px; font-weight: 200">
                             WIT OCT-2020
                         </a-button>
@@ -41,7 +41,6 @@
                         <a-divider/>
                         <div style="color: #888; font-weight: 200">{{time}}</div>
                     </div>
-                </a-affix>
             </a-col>
             <a-col :span="18">
                 <a-table :columns="columns" :data-source="sortedMd"
@@ -89,133 +88,11 @@
                 </div>
             </span>
                 </a-table>
-                <div style="margin: 20px">
-                    <apexchart type="area" height="350" :options="chartOptions" :series="series" :key="this.upCount"></apexchart>
-                </div>
             </a-col>
         </a-row>
-        <a-row>
-            <a-col :span="18" :offset="6">
-                <a-spin :spinning="spinning" size="large">
-                    <a-icon slot="indicator" type="loading-3-quarters"
-                            style="font-size: 180px; transform: translate(-70px, 50px)" spin/>
-                    <div class="fd-card" style="padding: 20px">
-                        <div style="font-size: 26px; color: #0a7fbe">
-                            <span class="fude-title">Transaction Order</span>
-                        </div>
-                        <a-descriptions bordered :column="4">
-                            <a-descriptions-item label="Broker Name" :span="2">
-                                Morgan Stanley Huaxin Securities Co., Ltd.
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Order Type" :span="2">
-                                <a-select style="width: 115px"
-                                          v-model="txOrder.orderType"
-                                          placeholder="Select">
-                                    <a-select-option value="Market Order">
-                                        Market Order
-                                    </a-select-option>
-                                    <a-select-option value="Limit Order">
-                                        Limit Order
-                                    </a-select-option>
-                                    <a-select-option value="Stop Order">
-                                        Stop Order
-                                    </a-select-option>
-                                </a-select>
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Product Name" :span="2">
-                                WIT OTC-2020
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Buy/Sell" :span="2">
-                                <a-radio-group
-                                        v-model="txOrder.buyOrSell"
-                                        button-style="solid">
-                                    <a-radio-button value="Buy">
-                                        Buy
-                                    </a-radio-button>
-                                    <a-radio-button value="Sell">
-                                        Sell
-                                    </a-radio-button>
-                                </a-radio-group>
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Price" :span="1">
-                                <a-input-number size="large"
-                                                :formatter="value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                                                :step="0.01"
-                                                style="width: 100px"
-                                                v-model="txOrder.price"
-                                                v-if="txOrder.orderType != 'Market Order'"
-                                                :min="1" :default-value="1"/>
-                                <div v-else>
-                                    <a-button size="large" style="width: 100px;" :disabled="true">
-                                        Omitted
-                                    </a-button>
-                                </div>
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Quantity" :span="1">
-                                <a-input-number size="large" style="width: 70px"
-                                                v-model="txOrder.quantity"
-                                                :min="1" :default-value="1"/>
-                            </a-descriptions-item>
-                            <a-descriptions-item label="SUM" :span="2">
-                                <a-input-number size="large"
-                                                v-if="txOrder.orderType != 'Market Order'"
-                                                :formatter="value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                                                :step="0.01"
-                                                style="width: 100px"
-                                                :min="1"
-                                                :disabled="true"
-                                                :value="this.txOrder.quantity * this.txOrder.price"/>
-                                <div v-else>
-                                    <a-button size="large" style="width: 100px;" :disabled="true">
-                                        Omitted
-                                    </a-button>
-                                </div>
-                            </a-descriptions-item>
-                            <a-descriptions-item label="Declaration" :span="4">
-                                <p style="text-align: left">
-                                    I confirm this trade with the information below is correct:
-                                    <br>
-                                <ul>
-                                    <li>Broker Name: <strong>Morgan Stanley Huaxin Securities Co., Ltd.</strong>;</li>
-                                    <li>Order Type: <strong>{{this.txOrder.orderType}}</strong>;</li>
-                                    <li>Product Name: <strong>WIT OCT-2020</strong>;</li>
-                                    <li>Buy or Sell: <strong>{{this.txOrder.buyOrSell}}</strong>;</li>
-                                    <li v-if="txOrder.orderType != 'Market Order'">Price per Hand: <strong>￥{{this.txOrder.price}}</strong>;
-                                    </li>
-                                    <li>Quatity: <strong>{{this.txOrder.quantity}}</strong>;</li>
-                                    <li v-if="txOrder.orderType != 'Market Order'">Total Price: <strong>￥{{this.txOrder.quantity
-                                        * this.txOrder.price}}</strong>;
-                                    </li>
-                                </ul>
-                                </p>
-                                <div style="float: right">
-                                    <p>Trader: <strong>weixm</strong><br>
-                                        <strong>Morgan Stanley Huaxin Securities Co., Ltd.</strong>
-                                    </p>
-                                    <a-checkbox
-                                            v-model="txOrder.confirmed">
-                                        Confirmed.
-                                    </a-checkbox>
-                                </div>
-                            </a-descriptions-item>
-                        </a-descriptions>
-                        <a-button size="large" type="primary" @click="submitOrder"
-                                  style="margin-top: 20px" :disabled="!txOrder.confirmed">
-                            submit
-                        </a-button>
-                    </div>
-                </a-spin>
-            </a-col>
-        </a-row>
-        <a-row>
-            <a-col :span="18" :offset="6">
-                <div class="fd-card" style="text-align: left; padding: 20px">
-                    <div style="font-size: 26px; color: #0a7fbe">
-                        <span class="fude-title">For Cancel Order...</span></div>
-                    You can make a cancel order of all the pending order in Order History.
-                </div>
-            </a-col>
-        </a-row>
+        <div style="margin: 20px">
+            <apexchart type="area" height="650" :options="chartOptions" :series="series" :key="this.upCount"></apexchart>
+        </div>
     </div>
 </template>
 
@@ -291,7 +168,7 @@
                 columns,
                 chartOptions:{
                     chart: {
-                        height: 450,
+                        height: 650,
                         type: 'area',
                         zoom: {
                             enabled: false
@@ -359,7 +236,7 @@
                     this.$notification.open({
                         message: 'Processing The Transaction...',
                         description:
-                            'The transaction order you\'ve made is under processing. ' +
+                            'The transaction order you\'ve made are under processing. ' +
                             'You can check it on the Order History page and look up pending orders. ',
                         icon: <a-icon type = "clock-circle-o" spin style = "color: #ffbc67;" />,
                 })
@@ -433,30 +310,30 @@
             updateChart() {
                 let _this = this;
                 var xtime = new Date();
-                    this.time = setInterval(() => {
-                        xtime = new Date(xtime.getTime() + 60*60*1000);
-                        _this.chartOptions.xaxis.categories.push(
-                            xtime.getFullYear()+"-"+
-                            (xtime.getMonth()+1)+"-"+
-                            xtime.getDate()+"T"+
-                            xtime.getHours()+":"+
-                            xtime.getMinutes()+":"+
-                            xtime.getSeconds()+"Z"
-                        );
-                        // update table and md
-                        _this.simuTx();
-                        // update chart
-                        _this.series[0].data.push(Math.floor(this.mpb *100)/100);
-                        _this.series[1].data.push(Math.floor(this.mps *100)/100);
+                this.time = setInterval(() => {
+                    xtime = new Date(xtime.getTime() + 60*60*1000);
+                    _this.chartOptions.xaxis.categories.push(
+                        xtime.getFullYear()+"-"+
+                        (xtime.getMonth()+1)+"-"+
+                        xtime.getDate()+"T"+
+                        xtime.getHours()+":"+
+                        xtime.getMinutes()+":"+
+                        xtime.getSeconds()+"Z"
+                    );
+                    // update table and md
+                    _this.simuTx();
+                    // update chart
+                    _this.series[0].data.push(Math.floor(this.mpb *100)/100);
+                    _this.series[1].data.push(Math.floor(this.mps *100)/100);
 
-                        _this.upCount += 1;
+                    _this.upCount += 1;
 
-                        if (_this.upCount > 16) {
-                            _this.chartOptions.xaxis.categories.shift();
-                            _this.series[0].data.shift();
-                            _this.series[1].data.shift();
-                        }
-                    }, 1451);
+                    if (_this.upCount > 16) {
+                        _this.chartOptions.xaxis.categories.shift();
+                        _this.series[0].data.shift();
+                        _this.series[1].data.shift();
+                    }
+                }, 1451);
             },
             compare(property) {
                 return function(a,b){
@@ -466,23 +343,23 @@
                 }
             },
             simuTx(){
-              var allTx = this.md[0].concat(this.md[1]);
-              for (var i in allTx) {
-                  allTx[i]['price'] += ((Math.random()-0.5)*3);
-              }
-              allTx.sort(this.compare('price'));
-              var tmp0 = [];
-              var tmp1 = [];
-              for (var j in allTx) {
-                  if (j < 5) {
-                      tmp0.push(allTx[j])
-                  }  else {
-                      tmp1.push(allTx[j])
-                  }
-              }
-              this.md[0] = tmp0;
-              this.md[1] = tmp1;
-              this.updateTable();
+                var allTx = this.md[0].concat(this.md[1]);
+                for (var i in allTx) {
+                    allTx[i]['price'] += ((Math.random()-0.5)*3);
+                }
+                allTx.sort(this.compare('price'));
+                var tmp0 = [];
+                var tmp1 = [];
+                for (var j in allTx) {
+                    if (j < 5) {
+                        tmp0.push(allTx[j])
+                    }  else {
+                        tmp1.push(allTx[j])
+                    }
+                }
+                this.md[0] = tmp0;
+                this.md[1] = tmp1;
+                this.updateTable();
             }
         },
     }
@@ -497,8 +374,6 @@
     .fd-card {
         border-radius: 5px;
         box-shadow: 0 0 0 1px #e5e5e5;
-        padding-bottom: 10px;
-        padding-top: 10px;
         margin: 20px;
         overflow: hidden;
     }

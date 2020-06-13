@@ -13,6 +13,11 @@ const router = new Router({
     // ordinary user pages
     routes: [
         {
+            path: '/signin',
+            name: 'login',
+            component: loadView('login')
+        },
+        {
             path: '/',
             component: loadView('TabbarFrame'),
             children: [
@@ -34,10 +39,26 @@ const router = new Router({
             ]
         },
         {
-            path: '/signin',
-            name: 'login',
-            component: loadView('login')
-        }
+            path: '/broker',
+            component: loadView('broker/TabbarFrame'),
+            children: [
+                {
+                    path: 'md/:product',
+                    name: 'brokerMarketDepth',
+                    component: loadView('broker/OrderBook')
+                },
+                {
+                    path: 'tx',
+                    name: 'brokerOrderHistory',
+                    component: loadView('broker/OrderHistory')
+                },
+                {
+                    path: '',
+                    name: 'brokerIndex',
+                    component: loadView('broker/index')
+                }
+            ]
+        },
     ]
 });
 

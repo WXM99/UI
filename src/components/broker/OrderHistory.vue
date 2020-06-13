@@ -1,26 +1,19 @@
 <template>
     <div>
-        <div style="font-size: 26px; font-weight: 300; line-height: 36px">
-            Transactions from: <br>
-            <p class="fude-title"><span style="font-size: 48px">weixm</span>
-                <a-button style="margin-left: 20px; transform: translate(0, -8px)" @click="toPage('/signin')"> Log out</a-button>
-            <br>
-            Morgan Stanley Huaxin Securities Co., Ltd.
-            </p>
-        </div>
+        <a-button style="float: right; margin-bottom: 20px" @click="toPage('/signin')"> Log out</a-button><br>
         <a-row style="width: calc(100vw - 140px)">
             <a-col :span="24">
-                <a-table :columns="columns" :data-source="data" :scroll="{x:1600, y:350}">
+                <a-table :columns="columns" :data-source="data" :scroll="{x:1800, y:450}">
                 <span slot="action" slot-scope="text, record">
                     <a-button type="default" size="large"
-                              v-if="record.state == 'Pending'" @click="showModel(record)">Cancel</a-button>
+                              v-if="record.state == 'Finished'" @click="showModel(record)">Details</a-button>
                     <a-button type="default" size="large" v-else disabled>Cancel</a-button>
                 </span>
                     <span slot="state" slot-scope="text, record">
                     <a-tag color="blue" v-if="record.state == 'Finished'">Finished</a-tag>
                     <a-tag color="orange" v-else-if="record.state == 'Pending'">Pending</a-tag>
                     <a-tag v-else>Canceled</a-tag>
-                </span>
+                    </span>
                     <span slot="price" slot-scope="text, record">
                         <div v-if="(record.orderType=='Market Order' && record.state=='Finished')
                                     || (record.orderType=='Stop Order' && record.state=='Finished')">
@@ -40,22 +33,34 @@
                 </a-table>
             </a-col>
         </a-row>
-        <a-modal v-model="visible" title="Comfirm?"
-                 :confirm-loading="confirmLoading"
-                 @ok="handleOk" ok-text="Yes" cancel-text="No" >
-            <p style="text-align: center;">
-                <a-icon type="question-circle" style="font-size: 58px; color: #ff9c46; margin-bottom: 20px"/>
-            </p>
-            <p>Are you sure to make a cancel order to the order below?</p>
-            <ul>
-                <li>Product: {{cancelTx.productName}}</li>
-                <li>Broker: {{cancelTx.broker}}</li>
-                <li>Order Type: {{cancelTx.orderType}}</li>
-                <li>Price: {{cancelTx.price}}</li>
-                <li>Buy or Sell: {{cancelTx.buyOrSell}}</li>
-                <li>Volume: {{cancelTx.volume}}</li>
-                <li>Update at: {{cancelTx.updateTime}}</li>
-            </ul>
+        <a-modal v-model="visible" title="Transaction details" width="1200px">
+
+            <a-descriptions title="Order Info">
+                <a-descriptions-item label="Product">
+                    {{cancelTx.productName}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Initiator">
+                    {{cancelTx.seller}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Initiator Company">
+                    {{cancelTx.sellerComp}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Order Type">
+                    {{cancelTx.orderType}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Price">
+                    {{cancelTx.price}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Buy or Sell">
+                    {{cancelTx.buyOrSell}}
+                </a-descriptions-item>
+                <a-descriptions-item label="Volume">
+                    {{cancelTx.volume}}
+                </a-descriptions-item>
+            </a-descriptions>
+            <br>
+            <p style="font-size: 16px; font-weight: bold; color: rgba(0,0,0,0.85);">Transaction Logs</p>
+            <a-table :columns="columnsLog" :data-source="dataLog"></a-table>
         </a-modal>
     </div>
 </template>
@@ -67,10 +72,12 @@
         data() {
             return {
                 columns,
+                columnsLog,
                 data: [
                     {
                         'productName': 'WIT SPET-2020',
-                        'broker': 'Everbright Securities Co., Ltd.',
+                        'sellerComp': 'Everbright Securities Co., Ltd.',
+                        'seller': 'iceFrog',
                         'orderType': 'Limit Order',
                         'price': 15.12,
                         'volume': 10,
@@ -81,7 +88,8 @@
                     },
                     {
                         'productName': 'WIT SPET-2020',
-                        'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'weixm',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
                         'orderType': 'Market Order',
                         'price': 11.12,
                         'volume': 13,
@@ -91,7 +99,8 @@
                     },
                     {
                         'productName': 'WIT OCT-2020',
-                        'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'weixm',
                         'orderType': 'Limit Order',
                         'price': 14.12,
                         'volume': 1100,
@@ -101,7 +110,8 @@
                     },
                     {
                         'productName': 'WIT OCT-2020',
-                        'broker': 'Everbright Securities Co., Ltd.',
+                        'sellerComp': 'Everbright Securities Co., Ltd.',
+                        'seller': 'weixm',
                         'orderType': 'Limit Order',
                         'price': 15.12,
                         'volume': 20,
@@ -112,7 +122,8 @@
                     },
                     {
                         'productName': 'GOLD OCT-2020',
-                        'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'chuyuxuan123',
                         'orderType': 'Stop Order',
                         'price': 411.12,
                         'volume': 5,
@@ -122,7 +133,8 @@
                     },
                     {
                         'productName': 'GOLD OCT-2020',
-                        'broker': 'Everbright Securities Co., Ltd.',
+                        'sellerComp': 'Everbright Securities Co., Ltd.',
+                        'seller': 'iceFrog',
                         'orderType': 'Limit Order',
                         'price': 314.12,
                         'volume': 5,
@@ -132,7 +144,8 @@
                     },
                     {
                         'productName': 'WIT OCT-2020',
-                        'broker': 'Everbright Securities Co., Ltd.',
+                        'sellerComp': 'Everbright Securities Co., Ltd.',
+                        'seller': 'iceFrog',
                         'orderType': 'Market Order',
                         'price': 12.12,
                         'volume': 10,
@@ -143,17 +156,19 @@
                     },
                     {
                         'productName': 'WIT OCT-2020',
-                        'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'weixm',
                         'orderType': 'Market Order',
                         'price': 17.12,
                         'volume': 10,
                         'state': 'Finished',
                         'buyOrSell': "Buy",
-                        'updateTime': 'Fri Jun 12 2020 22:31:19 GMT+0800 (China Standard Time)'
+                        'updateTime': 'Fri Jun 12 2020 22:31:19 GMT+0800 (China Standard Time)',
                     },
                     {
                         'productName': 'GOLD OCT-2020',
-                        'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'chuyuxuan123',
                         'orderType': 'Stop Order',
                         'price': 200,
                         'volume': 10,
@@ -161,6 +176,16 @@
                         'buyOrSell': "Sell",
                         'updateTime': 'Fri Jun 12 2020 23:36:19 GMT+0800 (China Standard Time)'
                     },
+                ],
+                dataLog: [
+                    {
+                        'trader': 'chuyuxuan123',
+                        'traderComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'traderRole': 'Seller',
+                        'volume': 145,
+                        'price': '￥12.16',
+                        'time': 'Fri Jun 12 2020 21:31:19 GMT+0800 (China Standard Time)'
+                    }
                 ],
                 visible: false,
                 confirmLoading: false,
@@ -187,12 +212,12 @@
                         description:
                             'The cancel order you\'ve made is successfully handled. ',
                         icon: <a-icon type = "check-circle" style = "color: #6FB1FF;" />,
-                    })
+                })
                     for (var i in this.data) {
                         if (this.data[i] == this.cancelTx) {
-                            this.data[i].state="Canceled";
+                            this.data[i].state = "Canceled";
                             var now = new Date();
-                            this.data[i].updateTime=now.toString();
+                            this.data[i].updateTime = now.toString();
                         }
                     }
                 }, 2000);
@@ -202,18 +227,52 @@
             var now = new Date();
             var item = {
                 'productName': 'WIT OCT-2020',
-                'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                'seller': 'weixm',
                 'orderType': 'Stop Order',
                 'price': 6,
                 'volume': 6,
                 'totalPrice': 36,
                 'state': 'Pending',
-                'updateTime': new Date(now.valueOf()-92*1000).toString(),
+                'updateTime': new Date(now.valueOf() - 123 * 1000).toString(),
                 'buyOrSell': "Sell"
             };
             this.data.push(item);
         }
     };
+
+    const columnsLog = [
+        {
+            title: 'Trader',
+            dataIndex: 'trader',
+            align: 'center',
+        },
+        {
+            title: 'Trader Company',
+            dataIndex: 'traderComp',
+            align: 'center',
+        },
+        {
+            title: 'Trader Role',
+            dataIndex: 'traderRole',
+            align: 'center',
+        },
+        {
+            title: 'Volume',
+            dataIndex: 'volume',
+            align: 'center',
+        },
+        {
+            title: 'Price',
+            dataIndex: 'price',
+            align: 'center',
+        },
+        {
+            title: 'Trading Time',
+            dataIndex: 'time',
+            align: 'center',
+        },
+    ];
 
     const columns = [
         {
@@ -234,13 +293,21 @@
                 },
             ],
             onFilter: (value, record) => record.productName.indexOf(value) === 0,
-            fixed: 'left',
             width: 150,
+            fixed: 'left',
             align: 'center'
         },
         {
-            title: 'Broker Name',
-            dataIndex: 'broker',
+            title: 'Initiator',
+            dataIndex: 'seller',
+            fixed: 'left',
+            width: 150,
+            align: 'center',
+            scopedSlots: {customRender: 'seller'},
+        },
+        {
+            title: 'Initiator Company',
+            dataIndex: 'sellerComp',
             filters: [
                 {
                     text: 'Morgan Stanley Huaxin Securities Co., Ltd.',
@@ -251,7 +318,7 @@
                     value: 'Everbright Securities Co., Ltd.',
                 },
             ],
-            onFilter: (value, record) => record.broker.indexOf(value) === 0,
+            onFilter: (value, record) => record.sellerComp.indexOf(value) === 0,
             fixed: 'left',
             width: 320,
             align: 'center'
@@ -315,7 +382,7 @@
             title: 'Total Price',
             dataIndex: 'totalPrice',
             defaultSortOrder: 'descend',
-            sorter: (a, b) => a.price*a.volume - b.totalPrice*b.volume,
+            sorter: (a, b) => a.volume*a.price - b.volume*b.price,
             width: 130,
             align: 'center',
             scopedSlots: {customRender: 'totalPrice'},
@@ -404,5 +471,8 @@
 
     .ant-form-item {
         margin-bottom: 5px;
+    }
+    .ant-modal-footer > button:nth-child(1) {
+        display: none;
     }
 </style>

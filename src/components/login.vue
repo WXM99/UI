@@ -84,8 +84,7 @@
                                         <a-select
                                                 placeholder="Select Your Trading Company"
                                                 style="width: 100%"
-                                                v-decorator="['company',
-                                                { rules: [{ required: true, message: 'Please select your company!' }] },]">
+                                                v-decorator="['company']">
                                             <a-select-option value="MSHX">
                                                 Morgan Stanley Huaxin Securities
                                             </a-select-option>
@@ -98,15 +97,13 @@
                                         </a-select>
                                     </a-form-item>
                                     <a-form-item>
-                                        <a-input v-decorator="['userName',
-                                                { rules: [{ required: true, message: 'Please input your username!' }] },]"
+                                        <a-input v-decorator="['userName']"
                                                  placeholder="Username">
                                             <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)"/>
                                         </a-input>
                                     </a-form-item>
                                     <a-form-item>
-                                        <a-input v-decorator="['password',
-                                                { rules: [{ required: true, message: 'Please input your Password!' }] },]"
+                                        <a-input v-decorator="['password']"
                                                  type="password"
                                                  placeholder="Password">
                                             <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)"/>
@@ -128,9 +125,9 @@
                                 <div style="font-size: 26px; color: #0a7fbe">
                                     <span class="fude-title">Broker</span></div>
                                 <a-form
-                                        id="components-form-normal-login"
+                                        id="components-form-normal-login-b"
                                         :form="brokerForm"
-                                        class="login-form"
+                                        class="b-login-form"
                                         @submit="brokerLogin">
                                     <a-form-item>
                                         <a-select
@@ -210,6 +207,7 @@
                 this.traderForm.validateFields((err, values) => {
                     if (!err) {
                         console.log('Received values of form: ', values);
+                        this.$router.push('/broker')
                     }
                 });
             }
