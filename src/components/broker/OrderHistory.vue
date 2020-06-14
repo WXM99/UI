@@ -7,7 +7,7 @@
                 <span slot="action" slot-scope="text, record">
                     <a-button type="default" size="large"
                               v-if="record.state == 'Finished'" @click="showModel(record)">Details</a-button>
-                    <a-button type="default" size="large" v-else disabled>Cancel</a-button>
+                    <a-button type="default" size="large" v-else disabled>Details</a-button>
                 </span>
                     <span slot="state" slot-scope="text, record">
                     <a-tag color="blue" v-if="record.state == 'Finished'">Finished</a-tag>
@@ -17,7 +17,7 @@
                     <span slot="price" slot-scope="text, record">
                         <div v-if="(record.orderType=='Market Order' && record.state=='Finished')
                                     || (record.orderType=='Stop Order' && record.state=='Finished')">
-                            ￥{{record.price}} (AVG)
+                            ￥{{record.price}}
                         </div>
                         <div v-else-if="!(record.orderType=='Market Order' && record.state=='Pending')">
                             ￥{{record.price}}
@@ -59,7 +59,7 @@
                 </a-descriptions-item>
             </a-descriptions>
             <br>
-            <p style="font-size: 16px; font-weight: bold; color: rgba(0,0,0,0.85);">Transaction Logs</p>
+            <p style="font-size: 16px; font-weight: bold; color: rgba(0,0,0,0.85);">Counterpart</p>
             <a-table :columns="columnsLog" :data-source="dataLog"></a-table>
         </a-modal>
     </div>
@@ -155,15 +155,15 @@
                         'updateTime': 'Fri Jun 12 2020 23:31:19 GMT+0800 (China Standard Time)'
                     },
                     {
-                        'productName': 'WIT OCT-2020',
+                        'productName': 'WIT SPET-2020',
                         'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
-                        'seller': 'weixm',
-                        'orderType': 'Market Order',
-                        'price': 17.12,
-                        'volume': 10,
+                        'seller': 'chuyuxuan123',
+                        'orderType': 'Limit Order',
+                        'price': 11.12,
+                        'volume': 13,
                         'state': 'Finished',
-                        'buyOrSell': "Buy",
-                        'updateTime': 'Fri Jun 12 2020 22:31:19 GMT+0800 (China Standard Time)',
+                        'buyOrSell': "Sell",
+                        'updateTime': 'Fri Jun 12 2020 18:31:19 GMT+0800 (China Standard Time)',
                     },
                     {
                         'productName': 'GOLD OCT-2020',
@@ -176,15 +176,26 @@
                         'buyOrSell': "Sell",
                         'updateTime': 'Fri Jun 12 2020 23:36:19 GMT+0800 (China Standard Time)'
                     },
+                    {
+                        'productName': 'GOLD OCT-2020',
+                        'sellerComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
+                        'seller': 'weixm',
+                        'orderType': 'Limit Order',
+                        'price': 411.12,
+                        'volume': 5,
+                        'state': 'Finished',
+                        'buyOrSell': "Sell",
+                        'updateTime': 'Fri Jun 12 2020 22:31:19 GMT+0800 (China Standard Time)'
+                    }
                 ],
                 dataLog: [
                     {
                         'trader': 'chuyuxuan123',
                         'traderComp': 'Morgan Stanley Huaxin Securities Co., Ltd.',
-                        'traderRole': 'Seller',
-                        'volume': 145,
-                        'price': '￥12.16',
-                        'time': 'Fri Jun 12 2020 21:31:19 GMT+0800 (China Standard Time)'
+                        'traderRole': 'Buyer',
+                        'volume': 5,
+                        'price': '￥411.12',
+                        'time': 'Fri Jun 12 2020 22:31:19 GMT+0800 (China Standard Time)'
                     }
                 ],
                 visible: false,
