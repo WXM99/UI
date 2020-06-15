@@ -6,10 +6,10 @@
                     <div class="fd-card"
                          style="background: #fff; margin: 0 20px; margin-bottom: 20px; z-index: 2; padding: 20px">
                         <a-button style="font-size: 18px; font-weight: 200">
-                            WIT OCT-2020
+                            {{this.productName}}
                         </a-button>
                         <a-divider/>
-                        <span class="fude-title" style="font-size: 22px; font-weight: 300">Morgan Stanley Huaxin Securities Co., Ltd.</span>
+                        <span class="fude-title" style="font-size: 22px; font-weight: 300">{{this.brokerName}} Co., Ltd.</span>
                         <a-divider/>
                         <a-col :span="24">
                             <a-statistic
@@ -262,23 +262,26 @@
             apexchart: VueApexCharts
         },
         mounted() {
-            this.series[0].data.push(Math.floor(this.mpb *100)/100);
-            this.series[1].data.push(Math.floor(this.mps *100)/100);
-            var xtime = new Date();
-            this.chartOptions.xaxis.categories.push(
-                xtime.getFullYear()+"-"+
-                (xtime.getMonth()+1)+"-"+
-                xtime.getDate()+"T"+
-                xtime.getHours()+":"+
-                xtime.getMinutes()+":"+
-                xtime.getSeconds()+"Z"
-            );
+            var params = this.$route.params.product.split("-");
+            console.log(params);
+            this.productId = params[0];
+            this.brokerId = params[1];
+            for (var i in this.$store.state.allMds) {
+                if (this.$store.state.allMds[i].productId === this.productId &&
+                    this.$store.state.allMds[i].brokerId === this.brokerId) {
+                    this.productName = this.$store.state.allMds[i].productName + " " + this.$store.state.allMds[i].productPeriod;
+                    this.brokerName = this.$store.state.allMds[i].brokerName;
+                }
+            }
             this.updateTime();
-            this.updateTable();
-            this.updateChart();
+            this.updateMD();
         },
         data() {
             return {
+                productId: '',
+                brokerId: '',
+                brokerName: '',
+                productName: '',
                 websock: null,
                 username: "weixm",
                 time: '',
@@ -346,7 +349,8 @@
                     confirmed: false
                 },
                 spinning: false,
-                series: [{
+                series: [
+                    {
                     name: 'Buying Market Price',
                     data: []
                 }, {
@@ -356,14 +360,10 @@
                 upCount: 0,
             }
         },
-        created() {
-            // todo:
-            //this.initWebSocket();
-        },
-        destroyed() {
-            // this.websock.close()
-        },
         methods: {
+            /*
+             * making order
+             */
             submitOrder() {
                 console.log(this.txOrder);
                 this.spinning = true;
@@ -371,11 +371,11 @@
                     method: 'post',
                     url: 'http://3.233.219.143:30089/createOrder',
                     data: {
-                        "productId":"1",
-                        "brokerId":"1",
+                        'brokerId':this.brokerId,
+                        'productId':this.productId,
                         "price": this.txOrder.price,
                         "amount": this.txOrder.quantity,
-                        "traderId": this.$store.state.traderID,
+                        "traderId": this.$store.state.userId,
                         "type":this.txOrder.buyOrSell,
                         "orderType": this.switchOrderType(this.txOrder.orderType),
                     },
@@ -391,13 +391,6 @@
                                 'You can check it on the Order History page and look up pending orders. ',
                             icon: <a-icon type = "clock-circle-o" spin style = "color: #ffbc67;" />,
                         });
-                        if (this.txOrder.buyOrSell === 'sell') {
-                            this.md[0].push({'amount': this.txOrder.quantity, 'price': this.txOrder.price},);
-                            this.updateChart();
-                        } else {
-                            this.md[1].push({'amount': this.txOrder.quantity, 'price': this.txOrder.price},);
-                            this.updateChart();
-                        }
                     } else {
                         this.$notification['error']({
                             message: 'Order Process Failed',
@@ -407,6 +400,7 @@
                     }
                 });
             },
+                // helper of above one
             switchOrderType(ot) {
                 switch (ot) {
                     case "Market Order": return "market";
@@ -415,53 +409,42 @@
                     default: return "";
                 }
             },
+            // local clock
             updateTime() {
                 let _this = this;
                 this.time = setInterval(() => {
                     _this.time = new Date();
                 }, 1000);
             },
-            updateChart() {
-                let _this = this;
-                var xtime = new Date();
-                xtime = new Date(xtime.getTime() + 30*60*1000);
-                this.chartOptions.xaxis.categories.push(
-                        xtime.getFullYear()+"-"+
-                        (xtime.getMonth()+1)+"-"+
-                        xtime.getDate()+"T"+
-                        xtime.getHours()+":"+
-                        xtime.getMinutes()+":"+
-                        xtime.getSeconds()+"Z"
-                );
-                    // update table and md
-                this.simuTx();
-                    // update chart
-                this.series[0].data.push(Math.floor(this.mpb *100)/100);
-                this.series[1].data.push(Math.floor(this.mps *100)/100);
+            /*
+             * updateMD updates every thing when get md from server
+             */
+            updateMD() {
+                this.$axios({
+                    method: 'get',
+                    url: "http://3.233.219.143:30089/sendFront",
+                    params: {
+                        'brokerId':this.brokerId,
+                        'productId':this.productId
+                    },
+                    withCredentials: true
+                }).then(response => {
+                    this.md = response.data;
+                    console.log("md: ",this.md);
+                    if (this.md[0].length > 5) {
+                        var tmp = this.md[0].reverse();
+                        this.md[0] = tmp.splice(5).reverse();
 
-                this.upCount += 1;
-                if (_this.upCount > 16) {
-                    this.chartOptions.xaxis.categories.shift();
-                    this.series[0].data.shift();
-                    this.series[1].data.shift();
-                }
-            },
-            simuTx(){
-                var allTx = this.md[0].concat(this.md[1]);
-                allTx.sort(this.compare('price'));
-                var tmp0 = [];
-                var tmp1 = [];
-                for (var j in allTx) {
-                    if (j < 5) {
-                        tmp0.push(allTx[j])
-                    }  else {
-                        tmp1.push(allTx[j])
                     }
-                }
-                this.md[0] = tmp0;
-                this.md[1] = tmp1;
-                this.updateTable();
+                    if (this.md[1].length > 5) {
+                        this.md[1] = this.md[1].splice(5)
+                    }
+                    this.initWebSocket();
+                    this.updateTable();
+                    this.updateChart();
+                })
             },
+            // to sort md
             compare(property) {
                 return function(a,b){
                     var value1 = a[property];
@@ -469,7 +452,8 @@
                     return value2 - value1;
                 }
             },
-            updateTable(){
+            // make md to fit the table
+            updateTable() {
                 let sells = this.md[0];
                 let buyrs = this.md[1];
                 var i = 0;
@@ -497,13 +481,49 @@
                     tmpTable.push(order);
                     i += 1;
                 }
-                this.mpb = buyrs[0].price;
-                this.mps = sells[sells.length - 1].price;
+                // update 2 mp
+                if (buyrs.length !== 0) {
+                    this.mpb = buyrs[0].price;
+                }
+                if (sells.length !== 0) {
+                    this.mps = sells[sells.length - 1].price;
+                }
                 this.sortedMd = tmpTable;
+                console.log("smd:", this.sortedMd);
             },
+            // add 2 mp to chart
+            updateChart() {
+                // present time
+                var xtime = new Date();
+                xtime = new Date(xtime.getTime() + 30*60*1000);
+                // add to x axis in the chart
+                this.chartOptions.xaxis.categories.push(
+                    xtime.getFullYear()+"-"+
+                    (xtime.getMonth()+1)+"-"+
+                    xtime.getDate()+"T"+
+                    xtime.getHours()+":"+
+                    xtime.getMinutes()+":"+
+                    xtime.getSeconds()+"Z"
+                );
+                // add value to y axis in the chart
+                this.series[0].data.push(Math.floor(this.mpb *100)/100);
+                this.series[1].data.push(Math.floor(this.mps *100)/100);
+                // rerender
+                this.upCount += 1;
+                // time window
+                if (this.upCount > 16) {
+                    this.chartOptions.xaxis.categories.shift();
+                    this.series[0].data.shift();
+                    this.series[1].data.shift();
+                }
+            },
+            /*
+             * ws apis
+             */
             initWebSocket() {
+                console.log("connecting...");
                 // todo: change to ws server addr
-                const wsUrl = 'ws://localhost:8089/connection/' + this.username;
+                const wsUrl = 'ws://3.233.219.143:30088/connection/' + this.$store.state.username;
                 this.websock = new WebSocket(wsUrl);
                 this.websock.onmessage = this.websocketonmessage;
                 this.websock.onopen = this.websocketonopen;
@@ -519,7 +539,14 @@
             },
             websocketonmessage(e) {
                 console.log(e);
-                this.msg.push(e.data)
+                // this.msg.push(e.data)
+                var resp = JSON.parse(e.data);
+                console.log(resp);
+                if (resp.brokerId === this.brokerId && resp.productId === this.productId) {
+                    this.md = resp.marketDepth;
+                    this.updateTable();
+                    this.updateChart();
+                }
             },
             websocketsend(Data) {
                 this.websock.send(Data);
@@ -528,6 +555,9 @@
                 console.log('closing connection...', e);
             },
         },
+    destroyed() {
+        this.websock.close()
+    },
     }
 </script>
 <style scoped>

@@ -10,6 +10,7 @@ let state = {
     userJWT: "",
     username: "",
     userComp: "",
+    allMds: [],
 };
 
 export default new Vuex.Store({

@@ -179,7 +179,7 @@
                 this.visible = true;
             },
             handleOk() {
-                this.confirmLoading = true;
+                /*
                 setTimeout(() => {
                     this.visible = false;
                     this.confirmLoading = false;
@@ -197,12 +197,52 @@
                         }
                     }
                 }, 2000);
+                */
+                this.confirmLoading = true;
+                this.$axios({
+                    method: 'post',
+                    url: 'http://3.233.219.143:30089/createOrder',
+                    data: {
+                        'brokerId':this.cancelTx.brokerId,
+                        'productId':this.cancelTx.productId,
+                        "orderId": this.cancelTx.orderId,
+                        "traderId": this.$store.state.userId,
+                        "type": 'cancel',
+                    },
+                    withCredentials: true
+                }).then(response => {
+                    console.log('response\n', response.data);
+                    this.confirmLoading = true;
+                    this.visible = false;
+                    if (response.data==="OK") {
+                        this.$notification['success']({
+                            message: 'Canceled Successful!',
+                            description:
+                                'The order is canceled successfully and it has been dropped down from market depth.',
+                        });
+                        for (var i in this.data) {
+                            if (this.data[i] == this.cancelTx) {
+                                this.data[i].state="Canceled";
+                                var now = new Date();
+                                this.data[i].updateTime=now.toString();
+                            }
+                        }
+                    } else {
+                        this.$notification['error']({
+                            message: 'Cancel Failed',
+                            description:
+                                'The order is not in pending state anymore',
+                        });
+                    }
+                });
+                console.log(this.cancelTx)
             }
         },
         mounted() {
             // var now = new Date();
             /* var item = {
                 'productName': 'WIT OCT-2020',
+
                 'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
                 'orderType': 'Stop Order',
                 'price': 6,
@@ -221,10 +261,11 @@
             }).then(response => {
                 console.log('resp: \n', response);
                 var tmpData = response.data;
-                for (var i in tmpData) {
-                    tmpData[i].productName += " OCT-2020";
-                }
+                // for (var i in tmpData) {
+                //     tmpData[i].productName += " OCT-2020";
+                // }
                 this.data = tmpData;
+                console.log(this.data)
             })
 
         }

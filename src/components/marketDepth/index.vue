@@ -10,18 +10,17 @@
             <div style="font-size: 22px; font-weight: 200">{{time}}</div>
         </div>
         <a-row type="flex" justify="space-around">
-            <a-col :span="12">
-                <div class="fd-card">
-                    <div class="br-title"> Broker: Morgan Stanley Huaxin Securities Co., Ltd. <span
-                            style="float: right">600621</span></div>
+                <a-col :span="12" v-for="board in this.allBoards" :key='board.productId+board.brokerId' >
                     <div class="fd-card">
-                        <p class="pr-title">WIT OCT-2020</p>
+                        <div class="br-title"> Broker: {{board.brokerName}} Co., Ltd. <span
+                                style="float: right">600621</span></div>
+                        <p class="pr-title">{{board.productName + ' ' + board.productPeriod}}</p>
                         <p style="text-align: center">Update At: {{time}}</p>
                         <a-row style="text-align: center">
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Selling"
-                                        :value="this.prices[1][0]"
+                                        :value="board.sellPrice"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#345586' }"
@@ -34,7 +33,7 @@
                             <a-col :span="12">
                                 <a-statistic
                                         title="Market Price of Buying"
-                                        :value="this.prices[1][1]"
+                                        :value="board.buyPrice"
                                         :precision="2"
                                         suffix="CNY/share"
                                         :value-style="{ color: '#cf7426' }"
@@ -46,192 +45,10 @@
                             </a-col>
                         </a-row>
                         <div style="text-align: center; margin-top: 20px">
-                            <a-button @click="toPage('/md/hx-wit-oct2020')">Detailed Market Depth</a-button>
+                            <a-button @click="toPage('/md/'+board.productId+'-'+board.brokerId)">Detailed Market Depth</a-button>
                         </div>
                     </div>
-                    <div class="fd-card">
-                        <p class="pr-title">WIT SPET-2020</p>
-                        <p style="text-align: center">Update At: {{time}}</p>
-                        <a-row style="text-align: center">
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Selling"
-                                        :value="this.prices[3][0]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#345586' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="logout"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Buying"
-                                        :value="this.prices[3][1]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#cf7426' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="login"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                        </a-row>
-                        <div style="text-align: center; margin-top: 20px">
-                            <a-button>Detailed Market Depth</a-button>
-                        </div>
-                    </div>
-                    <div class="fd-card">
-                        <p class="pr-title">GOLD OCT-2020</p>
-                        <p style="text-align: center">Update At: {{time}}</p>
-                        <a-row style="text-align: center">
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Selling"
-                                        :value="this.prices[5][0]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#345586' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="logout"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Buying"
-                                        :value="this.prices[5][1]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#cf7426' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="login"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                        </a-row>
-                        <div style="text-align: center; margin-top: 20px">
-                            <a-button>Detailed Market Depth</a-button>
-                        </div>
-                    </div>
-                </div>
-            </a-col>
-            <a-col :span="12">
-                <div class="fd-card">
-                    <div class="br-title"> Broker: Everbright Securities Co., Ltd. <span
-                            style="float: right">601788</span></div>
-                    <div class="fd-card">
-                        <p class="pr-title">WIT OCT-2020</p>
-                        <p style="text-align: center">Update At: {{time}}</p>
-                        <a-row style="text-align: center">
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Selling"
-                                        :value="this.prices[0][0]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#345586' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="logout"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Buying"
-                                        :value="this.prices[0][1]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#cf7426' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="login"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                        </a-row>
-                        <div style="text-align: center; margin-top: 20px">
-                            <a-button>Detailed Market Depth</a-button>
-                        </div>
-                    </div>
-                    <div class="fd-card">
-                        <p class="pr-title">WIT SPET-2020</p>
-                        <p style="text-align: center">Update At: {{time}}</p>
-                        <a-row style="text-align: center">
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Selling"
-                                        :value="this.prices[2][0]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#345586' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="logout"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Buying"
-                                        :value="this.prices[2][1]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#cf7426' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="login"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                        </a-row>
-                        <div style="text-align: center; margin-top: 20px">
-                            <a-button>Detailed Market Depth</a-button>
-                        </div>
-                    </div>
-                    <div class="fd-card">
-                        <p class="pr-title">GOLD OCT-2020</p>
-                        <p style="text-align: center">Update At: {{time}}</p>
-                        <a-row style="text-align: center">
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Selling"
-                                        :value="this.prices[4][0]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#345586' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="logout"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                            <a-col :span="12">
-                                <a-statistic
-                                        title="Market Price of Buying"
-                                        :value="this.prices[4][1]"
-                                        :precision="2"
-                                        suffix="CNY/share"
-                                        :value-style="{ color: '#cf7426' }"
-                                        style="margin-left: 20px">
-                                    <template #prefix>
-                                        <a-icon type="login"/>
-                                    </template>
-                                </a-statistic>
-                            </a-col>
-                        </a-row>
-                        <div style="text-align: center; margin-top: 20px">
-                            <a-button>Detailed Market Depth</a-button>
-                        </div>
-                    </div>
-                </div>
-            </a-col>
+                </a-col>
         </a-row>
     </div>
 </template>
@@ -244,7 +61,8 @@
                 time: '',
                 prices: [
                     [12.12, 10.23],[15.31, 10,14],[22.12, 19.89],[23.54, 21.41],[351.13, 330.32],[364.86, 320.90]
-                ]
+                ],
+                allBoards: [],
             }
         },
         mounted() {
@@ -252,11 +70,15 @@
             this.time = setInterval(() => {
                 _this.time = new Date(); // 修改数据date
             }, 1000);
-            /*
-            this.time = setInterval(() => {
-                _this.updatePrices();
-            }, 1451)
-            *///
+            this.$axios({
+                method: 'get',
+                url: "http://3.233.219.143:30089/prices",
+                withCredentials: true
+            }).then(response => {
+                console.log("resp: ", response);
+                this.$store.state.allMds = response.data;
+                this.allBoards = response.data;
+            })
         },
         methods: {
             toPage(url) {
