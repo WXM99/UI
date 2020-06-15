@@ -84,26 +84,26 @@
                                         <a-select
                                                 placeholder="Select Your Trading Company"
                                                 style="width: 100%"
-                                                v-decorator="['company']">
-                                            <a-select-option value="MSHX">
+                                                v-decorator="['company', { rules: [{ required: true, message: 'Please input your company!' }] },]">
+                                            <a-select-option value="Morgan Stanley Huaxin Securities">
                                                 Morgan Stanley Huaxin Securities
                                             </a-select-option>
-                                            <a-select-option value="EB">
+                                            <a-select-option value="Everbright Securities">
                                                 Everbright Securities
                                             </a-select-option>
-                                            <a-select-option value="SI">
+                                            <a-select-option value="Sinolink Securities">
                                                 Sinolink Securities
                                             </a-select-option>
                                         </a-select>
                                     </a-form-item>
                                     <a-form-item>
-                                        <a-input v-decorator="['userName']"
+                                        <a-input v-decorator="['userName', { rules: [{ required: true, message: 'Please input your user name!' }] },]"
                                                  placeholder="Username">
                                             <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)"/>
                                         </a-input>
                                     </a-form-item>
                                     <a-form-item>
-                                        <a-input v-decorator="['password']"
+                                        <a-input v-decorator="['password', { rules: [{ required: true, message: 'Please input your Password!' }] },]"
                                                  type="password"
                                                  placeholder="Password">
                                             <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)"/>
@@ -114,7 +114,8 @@
                                                     v-decorator="['remember',{valuePropName: 'checked', initialValue: false}]">
                                             Remember me
                                         </a-checkbox>
-                                        <a-button type="primary" html-type="submit" class="login-form-button"
+                                        <a-button type="primary" html-type="submit"
+                                                  class="login-form-button" :loading="btnLoading"
                                                   style="float: left; margin-top: 5px">
                                             Sign in
                                         </a-button>
@@ -132,11 +133,11 @@
                                     <a-form-item>
                                         <a-select
                                                 placeholder="Select Your Broker Company"
-                                                style="width: 100%" v-decorator="['company']">
-                                            <a-select-option value="MS">
+                                                style="width: 100%" v-decorator="['company', { rules: [{ required: true, message: 'Please input your company!' }] },]">
+                                            <a-select-option value="Morgan Stanley Huaxin Securities">
                                                 Morgan Stanley Huaxin Securities
                                             </a-select-option>
-                                            <a-select-option value="EB">
+                                            <a-select-option value="Everbright Securities">
                                                 Everbright Securities
                                             </a-select-option>
                                         </a-select>
@@ -154,7 +155,8 @@
                                                     v-decorator="['remember',{valuePropName: 'checked', initialValue: false}]">
                                             Remember me
                                         </a-checkbox>
-                                        <a-button type="primary" html-type="submit" class="login-form-button"
+                                        <a-button type="primary" html-type="submit"
+                                                  class="login-form-button" :loading="btnBrokerLoading"
                                                   style="float: left; margin-top: 5px">
                                             Sign in
                                         </a-button>
@@ -181,7 +183,9 @@
     export default {
         data() {
             return {
-                id: 0
+                id: 0,
+                btnLoading: false,
+                btnBrokerLoading: false,
             }
         },
         beforeCreate() {
@@ -197,17 +201,71 @@
                 e.preventDefault();
                 this.traderForm.validateFields((err, values) => {
                     if (!err) {
-                        console.log('Received values of form: ', values);
-                        this.$router.push('/')
+                        this.btnLoading = true;
+                        this.$axios({
+                            method: 'post',
+                            url: 'http://3.233.219.143:30080/auth/trader/login',
+                            data: {
+                                "compName": values.company,
+                                "name": values.userName,
+                                "password": values.password,
+                            },
+                            withCredentials: true
+                        }).then(response => {
+                            console.log('response\n', response.data);
+                            if (response.data.success) {
+                                console.log(this.$store.state);
+                                this.$store.state.userComp = values.company;
+                                this.$store.state.username = values.userName;
+                                this.$store.state.userJWT = response.data.jwt;
+                                this.$store.state.userId = response.data.userId;
+                                this.$store.state.isLogin = true;
+                                this.$store.state.traderOrBroker = "trader";
+                                this.$router.push('/');
+                            } else {
+                                this.$notification['error']({
+                                    message: 'Sign In Failed',
+                                    description:
+                                        'Your user name, password and company name mismatched, please check again.',
+                                });
+                            }
+                        });
                     }
                 });
             },
             brokerLogin(e) {
+
                 e.preventDefault();
-                this.traderForm.validateFields((err, values) => {
+                this.brokerForm.validateFields((err, values) => {
                     if (!err) {
                         console.log('Received values of form: ', values);
-                        this.$router.push('/broker')
+                        this.btnBrokerLoading= true;
+                        this.$axios({
+                            method: 'post',
+                            url: 'http://3.233.219.143:30080/auth/broker/login',
+                            data: {
+                                "name": values.company,
+                                "password": values.password,
+                            },
+                            withCredentials: true
+                        }).then(response => {
+                            console.log('response\n', response.data);
+                            if (response.data.success) {
+                                console.log(this.$store.state);
+                                this.$store.state.userComp = values.company;
+                                this.$store.state.userJWT = response.data.jwt;
+                                this.$store.state.userId = response.data.userId;
+                                this.$store.state.isLogin = true;
+                                this.$store.state.traderOrBroker = "broker";
+                                this.$router.push('/broker');
+                            } else {
+                                this.$notification['error']({
+                                    message: 'Sign In Failed',
+                                    description:
+                                        'Your password and company name mismatched, please check again.',
+                                });
+                            }
+                        });
                     }
                 });
             }

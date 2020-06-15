@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import Cookies from 'js-cookie'
 
 Vue.use(Router);
 function loadView (view) {
@@ -61,6 +60,22 @@ const router = new Router({
         },
     ]
 });
+
+/*
+import Store from '../vuex/store'
+router.beforeEach((to, from, next) => {
+    if (to.name !== 'login') {
+        var isLogin = Store.state.isLogin;
+        if (!isLogin) {
+            router.push({name: 'login'})
+        } else {
+            next()
+        }
+    } else {
+        next()
+    }
+});
+*/
 
 
 export default router

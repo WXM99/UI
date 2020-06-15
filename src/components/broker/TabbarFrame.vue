@@ -9,8 +9,8 @@
             </div>
             <a-menu theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
                 <!--:default-selected-keys="['2']"-->
-                <a-menu-item key="0" @click="toPage('/broker')" style="color: #fff; margin-right: 40px; font-size: 26px; margin-bottom: 5px">
-                    Morgan Stanley Huaxin Securities Co., Ltd.<span style="font-size: 12px"> 600621</span>
+                <a-menu-item key="0" @click="toPage('/broker')" style="color: #fff; margin-right: 0px; font-size: 26px; margin-bottom: 5px">
+                    {{this.$store.state.userComp}}<span style="font-size: 12px"> 600621</span>
                 </a-menu-item>
                 <a-menu-item key="1" @click="toPage('/broker')" style="margin-bottom: 10px">Market Depth</a-menu-item>
                 <a-menu-item key="2" @click="toPage('/broker/tx')" style="margin-bottom: 10px">Transcation Records</a-menu-item>

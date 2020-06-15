@@ -129,10 +129,10 @@
                                 <a-radio-group
                                         v-model="txOrder.buyOrSell"
                                         button-style="solid">
-                                    <a-radio-button value="Buy">
+                                    <a-radio-button value="buy">
                                         Buy
                                     </a-radio-button>
-                                    <a-radio-button value="Sell">
+                                    <a-radio-button value="sell">
                                         Sell
                                     </a-radio-button>
                                 </a-radio-group>
@@ -189,8 +189,8 @@
                                 </ul>
                                 </p>
                                 <div style="float: right">
-                                    <p>Trader: <strong>weixm</strong><br>
-                                        <strong>Morgan Stanley Huaxin Securities Co., Ltd.</strong>
+                                    <p>Trader: <strong>{{this.$store.state.username}}</strong><br>
+                                        <strong>{{this.$store.state.userComp}} Co., Ltd.</strong>
                                     </p>
                                     <a-checkbox
                                             v-model="txOrder.confirmed">
@@ -262,6 +262,17 @@
             apexchart: VueApexCharts
         },
         mounted() {
+            this.series[0].data.push(Math.floor(this.mpb *100)/100);
+            this.series[1].data.push(Math.floor(this.mps *100)/100);
+            var xtime = new Date();
+            this.chartOptions.xaxis.categories.push(
+                xtime.getFullYear()+"-"+
+                (xtime.getMonth()+1)+"-"+
+                xtime.getDate()+"T"+
+                xtime.getHours()+":"+
+                xtime.getMinutes()+":"+
+                xtime.getSeconds()+"Z"
+            );
             this.updateTime();
             this.updateTable();
             this.updateChart();
@@ -277,15 +288,16 @@
                         {'amount': 981, 'price': 21.91},
                         {'amount': 981, 'price': 20.19},
                         {'amount': 1050, 'price': 18.11},
-                        {'amount': 510, 'price': 15.21},
-                        {'amount': 110, 'price': 13.61},
+                        {'amount': 510, 'price': 16.21},
+                        {'amount': 110, 'price': 15.31},
                     ],
                     [
-                        {'amount': 131, 'price': 13.11},
-                        {'amount': 831, 'price': 11.11},
-                        {'amount': 81, 'price': 10.19},
-                        {'amount': 14, 'price': 10.15},
-                        {'amount': 121, 'price': 10.01},
+                        {'amount': 131, 'price': 10.00},
+                        {'amount': 831, 'price': 9.11},
+                        {'amount': 831, 'price': 9.11},
+                        {'amount': 81, 'price': 9.09},
+                        {'amount': 14, 'price': 8.15},
+                        {'amount': 121, 'price': 8.01},
                     ]
                 ],
                 columns,
@@ -353,50 +365,109 @@
         },
         methods: {
             submitOrder() {
+                console.log(this.txOrder);
                 this.spinning = true;
-                setTimeout(() => {
+                this.$axios({
+                    method: 'post',
+                    url: 'http://3.233.219.143:30089/createOrder',
+                    data: {
+                        "productId":"1",
+                        "brokerId":"1",
+                        "price": this.txOrder.price,
+                        "amount": this.txOrder.quantity,
+                        "traderId": this.$store.state.traderID,
+                        "type":this.txOrder.buyOrSell,
+                        "orderType": this.switchOrderType(this.txOrder.orderType),
+                    },
+                    withCredentials: true
+                }).then(response => {
+                    console.log('response\n', response.data);
                     this.spinning = false;
-                    this.$notification.open({
-                        message: 'Processing The Transaction...',
-                        description:
-                            'The transaction order you\'ve made is under processing. ' +
-                            'You can check it on the Order History page and look up pending orders. ',
-                        icon: <a-icon type = "clock-circle-o" spin style = "color: #ffbc67;" />,
-                })
-                    ;
-                }, 3000);
+                    if (response.data==="OK") {
+                        this.$notification.open({
+                            message: 'Processing The Transaction...',
+                            description:
+                                'The transaction order you\'ve made is under processing. ' +
+                                'You can check it on the Order History page and look up pending orders. ',
+                            icon: <a-icon type = "clock-circle-o" spin style = "color: #ffbc67;" />,
+                        });
+                        if (this.txOrder.buyOrSell === 'sell') {
+                            this.md[0].push({'amount': this.txOrder.quantity, 'price': this.txOrder.price},);
+                            this.updateChart();
+                        } else {
+                            this.md[1].push({'amount': this.txOrder.quantity, 'price': this.txOrder.price},);
+                            this.updateChart();
+                        }
+                    } else {
+                        this.$notification['error']({
+                            message: 'Order Process Failed',
+                            description:
+                                'Please check your transaction sheet',
+                        });
+                    }
+                });
             },
-            initWebSocket() {
-                // todo: change to ws server addr
-                const wsUrl = 'ws://localhost:8089/connection/' + this.username;
-                this.websock = new WebSocket(wsUrl);
-                this.websock.onmessage = this.websocketonmessage;
-                this.websock.onopen = this.websocketonopen;
-                this.websock.onerror = this.websocketonerror;
-                this.websock.onclose = this.websocketclose;
-            },
-            websocketonopen() {
-                // let actions = {"msg": "hello, server!"};
-                // this.websocketsend(JSON.stringify(actions));
-            },
-            websocketonerror() {
-                //  this.initWebSocket();
-            },
-            websocketonmessage(e) {
-                console.log(e);
-                this.msg.push(e.data)
-            },
-            websocketsend(Data) {
-                this.websock.send(Data);
-            },
-            websocketclose(e) {
-                console.log('closing connection...', e);
+            switchOrderType(ot) {
+                switch (ot) {
+                    case "Market Order": return "market";
+                    case "Limit Order": return "limit";
+                    case "Stop Order": return "stop";
+                    default: return "";
+                }
             },
             updateTime() {
                 let _this = this;
                 this.time = setInterval(() => {
                     _this.time = new Date();
                 }, 1000);
+            },
+            updateChart() {
+                let _this = this;
+                var xtime = new Date();
+                xtime = new Date(xtime.getTime() + 30*60*1000);
+                this.chartOptions.xaxis.categories.push(
+                        xtime.getFullYear()+"-"+
+                        (xtime.getMonth()+1)+"-"+
+                        xtime.getDate()+"T"+
+                        xtime.getHours()+":"+
+                        xtime.getMinutes()+":"+
+                        xtime.getSeconds()+"Z"
+                );
+                    // update table and md
+                this.simuTx();
+                    // update chart
+                this.series[0].data.push(Math.floor(this.mpb *100)/100);
+                this.series[1].data.push(Math.floor(this.mps *100)/100);
+
+                this.upCount += 1;
+                if (_this.upCount > 16) {
+                    this.chartOptions.xaxis.categories.shift();
+                    this.series[0].data.shift();
+                    this.series[1].data.shift();
+                }
+            },
+            simuTx(){
+                var allTx = this.md[0].concat(this.md[1]);
+                allTx.sort(this.compare('price'));
+                var tmp0 = [];
+                var tmp1 = [];
+                for (var j in allTx) {
+                    if (j < 5) {
+                        tmp0.push(allTx[j])
+                    }  else {
+                        tmp1.push(allTx[j])
+                    }
+                }
+                this.md[0] = tmp0;
+                this.md[1] = tmp1;
+                this.updateTable();
+            },
+            compare(property) {
+                return function(a,b){
+                    var value1 = a[property];
+                    var value2 = b[property];
+                    return value2 - value1;
+                }
             },
             updateTable(){
                 let sells = this.md[0];
@@ -430,60 +501,32 @@
                 this.mps = sells[sells.length - 1].price;
                 this.sortedMd = tmpTable;
             },
-            updateChart() {
-                let _this = this;
-                var xtime = new Date();
-                    this.time = setInterval(() => {
-                        xtime = new Date(xtime.getTime() + 60*60*1000);
-                        _this.chartOptions.xaxis.categories.push(
-                            xtime.getFullYear()+"-"+
-                            (xtime.getMonth()+1)+"-"+
-                            xtime.getDate()+"T"+
-                            xtime.getHours()+":"+
-                            xtime.getMinutes()+":"+
-                            xtime.getSeconds()+"Z"
-                        );
-                        // update table and md
-                        _this.simuTx();
-                        // update chart
-                        _this.series[0].data.push(Math.floor(this.mpb *100)/100);
-                        _this.series[1].data.push(Math.floor(this.mps *100)/100);
-
-                        _this.upCount += 1;
-
-                        if (_this.upCount > 16) {
-                            _this.chartOptions.xaxis.categories.shift();
-                            _this.series[0].data.shift();
-                            _this.series[1].data.shift();
-                        }
-                    }, 1451);
+            initWebSocket() {
+                // todo: change to ws server addr
+                const wsUrl = 'ws://localhost:8089/connection/' + this.username;
+                this.websock = new WebSocket(wsUrl);
+                this.websock.onmessage = this.websocketonmessage;
+                this.websock.onopen = this.websocketonopen;
+                this.websock.onerror = this.websocketonerror;
+                this.websock.onclose = this.websocketclose;
             },
-            compare(property) {
-                return function(a,b){
-                    var value1 = a[property];
-                    var value2 = b[property];
-                    return value2 - value1;
-                }
+            websocketonopen() {
+                // let actions = {"msg": "hello, server!"};
+                // this.websocketsend(JSON.stringify(actions));
             },
-            simuTx(){
-              var allTx = this.md[0].concat(this.md[1]);
-              for (var i in allTx) {
-                  allTx[i]['price'] += ((Math.random()-0.5)*3);
-              }
-              allTx.sort(this.compare('price'));
-              var tmp0 = [];
-              var tmp1 = [];
-              for (var j in allTx) {
-                  if (j < 5) {
-                      tmp0.push(allTx[j])
-                  }  else {
-                      tmp1.push(allTx[j])
-                  }
-              }
-              this.md[0] = tmp0;
-              this.md[1] = tmp1;
-              this.updateTable();
-            }
+            websocketonerror() {
+                //  this.initWebSocket();
+            },
+            websocketonmessage(e) {
+                console.log(e);
+                this.msg.push(e.data)
+            },
+            websocketsend(Data) {
+                this.websock.send(Data);
+            },
+            websocketclose(e) {
+                console.log('closing connection...', e);
+            },
         },
     }
 </script>

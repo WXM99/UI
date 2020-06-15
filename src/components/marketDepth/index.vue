@@ -251,10 +251,12 @@
             let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
             this.time = setInterval(() => {
                 _this.time = new Date(); // 修改数据date
-            }, 1000)
+            }, 1000);
+            /*
             this.time = setInterval(() => {
                 _this.updatePrices();
             }, 1451)
+            *///
         },
         methods: {
             toPage(url) {

@@ -2,10 +2,10 @@
     <div>
         <div style="font-size: 26px; font-weight: 300; line-height: 36px">
             Transactions from: <br>
-            <p class="fude-title"><span style="font-size: 48px">weixm</span>
+            <p class="fude-title"><span style="font-size: 48px">{{this.$store.state.username}}</span>
                 <a-button style="margin-left: 20px; transform: translate(0, -8px)" @click="toPage('/signin')"> Log out</a-button>
             <br>
-            Morgan Stanley Huaxin Securities Co., Ltd.
+                {{this.$store.state.userComp}} Co., Ltd.
             </p>
         </div>
         <a-row style="width: calc(100vw - 140px)">
@@ -68,6 +68,7 @@
             return {
                 columns,
                 data: [
+                    /*
                     {
                         'productName': 'WIT SPET-2020',
                         'broker': 'Everbright Securities Co., Ltd.',
@@ -160,7 +161,7 @@
                         'state': 'Canceled',
                         'buyOrSell': "Sell",
                         'updateTime': 'Fri Jun 12 2020 23:36:19 GMT+0800 (China Standard Time)'
-                    },
+                    },*/
                 ],
                 visible: false,
                 confirmLoading: false,
@@ -199,8 +200,8 @@
             }
         },
         mounted() {
-            var now = new Date();
-            var item = {
+            // var now = new Date();
+            /* var item = {
                 'productName': 'WIT OCT-2020',
                 'broker': 'Morgan Stanley Huaxin Securities Co., Ltd.',
                 'orderType': 'Stop Order',
@@ -210,8 +211,22 @@
                 'state': 'Pending',
                 'updateTime': new Date(now.valueOf()-92*1000).toString(),
                 'buyOrSell': "Sell"
-            };
-            this.data.push(item);
+            };*/
+            // this.data.push(item);\
+            // http://3.233.219.143:30089/traderOrderHistory?traderId=1
+            this.$axios({
+                method: 'get',
+                url: 'http://3.233.219.143:30089/traderOrderHistory?traderId='+this.$store.state.userId,
+                withCredentials: true
+            }).then(response => {
+                console.log('resp: \n', response);
+                var tmpData = response.data;
+                for (var i in tmpData) {
+                    tmpData[i].productName += " OCT-2020";
+                }
+                this.data = tmpData;
+            })
+
         }
     };
 
