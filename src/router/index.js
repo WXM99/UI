@@ -61,7 +61,7 @@ const router = new Router({
     ]
 });
 
-/*
+
 import Store from '../vuex/store'
 router.beforeEach((to, from, next) => {
     if (to.name !== 'login') {
@@ -75,7 +75,7 @@ router.beforeEach((to, from, next) => {
         next()
     }
 });
-*/
+
 
 
 export default router
