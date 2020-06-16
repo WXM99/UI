@@ -3,7 +3,7 @@
         <div style="font-size: 26px; font-weight: 300; line-height: 36px">
             Transactions from: <br>
             <p class="fude-title"><span style="font-size: 48px">{{this.$store.state.username}}</span>
-                <a-button style="margin-left: 20px; transform: translate(0, -8px)" @click="toPage('/signin')"> Log out</a-button>
+                <a-button style="margin-left: 20px; transform: translate(0, -8px)" @click="logout"> Log out</a-button>
             <br>
                 {{this.$store.state.userComp}} Co., Ltd.
             </p>
@@ -171,6 +171,10 @@
         beforeCreate() {
         },
         methods: {
+            logout() {
+                this.$store.state.isLogin = false;
+                this.$router.push("/signin");
+            },
             toPage(url) {
                 this.$router.push(url)
             },
